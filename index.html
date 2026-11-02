@@ -1,1 +1,341 @@
 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NOVA BANK | Digital Banking</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f4f6fa;color:#17243a;font-family:Arial,sans-serif}
+header{background:#10213d;color:white;padding:24px}
+.logo{font-size:26px;font-weight:800;letter-spacing:3px}
+.tagline{font-size:11px;color:#bdcde1;margin-top:6px;letter-spacing:1px}
+.container{max-width:900px;margin:auto;padding:22px}
+.auth{max-width:430px;margin:45px auto;background:white;padding:30px;border-radius:18px;box-shadow:0 8px 30px #14274412}
+h2{margin-top:0;color:#152944}
+.sub{color:#718096;font-size:14px;line-height:1.6}
+label{display:block;font-size:13px;font-weight:bold;margin:18px 0 8px}
+input{width:100%;padding:14px;border:1px solid #dce2eb;border-radius:9px;font-size:15px;outline:none}
+input:focus{border-color:#285a91}
+.primary{width:100%;border:0;border-radius:9px;background:#173b68;color:white;padding:15px;font-size:15px;font-weight:bold;margin-top:20px;cursor:pointer}
+.secondary{background:white;color:#173b68;border:1px solid #173b68;padding:11px 16px;border-radius:9px;cursor:pointer}
+.switch{text-align:center;font-size:14px;margin-top:20px;color:#65738a}
+.link{color:#205c9c;font-weight:bold;cursor:pointer}
+.hidden{display:none!important}
+.error{color:#c0392b;font-size:13px;margin-top:12px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.balance{background:linear-gradient(130deg,#10213d,#28588b);color:white;padding:28px;border-radius:18px;margin:22px 0}
+.balance small{color:#d3e3f6;letter-spacing:1px}
+.amount{font-size:37px;font-weight:bold;margin:17px 0}
+.account{font-size:13px;color:#d3e3f6}
+.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px 0}
+.action{background:white;border:0;border-radius:13px;padding:19px 5px;color:#19365b;font-weight:bold;cursor:pointer}
+.action span{display:block;font-size:24px;margin-bottom:9px}
+.panel{background:white;border-radius:15px;padding:19px;margin:14px 0}
+.section{font-size:19px;margin-top:30px}
+.transaction{display:flex;justify-content:space-between;gap:10px;padding:16px 0;border-bottom:1px solid #edf0f4;font-size:14px}
+.transaction:last-child{border:0}
+.positive{color:#12855b;font-weight:bold}
+.negative{color:#b34242;font-weight:bold}
+.small{font-size:12px;color:#78869a}
+.modal{position:fixed;inset:0;background:#07172dcc;display:none;align-items:center;justify-content:center;padding:20px}
+.dialog{background:white;padding:26px;border-radius:17px;width:100%;max-width:400px}
+.close{float:right;background:none;border:0;font-size:25px;cursor:pointer}
+footer{text-align:center;color:#8490a0;font-size:11px;padding:25px}
+</style>
+</head>
+<body>
+
+<header>
+ <div class="logo">NOVA BANK</div>
+ <div class="tagline">A NEW WAY TO EXPERIENCE DIGITAL BANKING</div>
+</header>
+
+<!-- LOGIN -->
+<section id="loginPage" class="container">
+ <div class="auth">
+  <h2>Welcome back</h2>
+  <p class="sub">Sign in to your Nova account.</p>
+  <form id="loginForm">
+   <label>Email address</label>
+   <input id="loginEmail" type="email" placeholder="name@gmail.com" required>
+   <label>Password</label>
+   <input id="loginPassword" type="password" placeholder="Enter your password" required>
+   <button class="primary" type="submit">Sign in</button>
+   <p id="loginError" class="error"></p>
+  </form>
+  <div class="switch">
+   Don't have an account?
+   <span class="link" onclick="showPage('signupPage')">Create account</span>
+  </div>
+ </div>
+</section>
+
+<!-- REGISTRATION -->
+<section id="signupPage" class="container hidden">
+ <div class="auth">
+  <h2>Create your account</h2>
+  <p class="sub">Get started with Nova.</p>
+  <form id="signupForm">
+   <label>Full name</label>
+   <input id="signupName" placeholder="Your full name" required>
+   <label>Gmail address</label>
+   <input id="signupEmail" type="email" placeholder="name@gmail.com" required>
+   <label>Create password</label>
+   <input id="signupPassword" type="password" minlength="4" maxlength="8" placeholder="4–8 characters" required>
+   <label>Confirm password</label>
+   <input id="confirmPassword" type="password" minlength="4" maxlength="8" placeholder="Confirm password" required>
+   <button class="primary" type="submit">Create account</button>
+   <p id="signupError" class="error"></p>
+  </form>
+  <div class="switch">
+   Already have an account?
+   <span class="link" onclick="showPage('loginPage')">Sign in</span>
+  </div>
+ </div>
+</section>
+
+<!-- DASHBOARD -->
+<section id="dashboard" class="container hidden">
+ <div class="top">
+  <div>
+   <p class="small">PERSONAL BANKING</p>
+   <h2 id="welcomeName">Welcome</h2>
+  </div>
+  <button class="secondary" onclick="logout()">Log out</button>
+ </div>
+
+ <div class="balance">
+  <small>AVAILABLE BALANCE</small>
+  <div class="amount" id="balance">$0.00</div>
+  <div class="account" id="accountNumber"></div>
+ </div>
+
+ <div class="actions">
+  <button class="action" onclick="openTransfer()"><span>↗</span>Transfer</button>
+  <button class="action" onclick="message('Deposits are not available.')"><span>＋</span>Deposit</button>
+  <button class="action" onclick="message('Withdrawals are not available.')"><span>↓</span>Withdraw</button>
+ </div>
+
+ <h3 class="section">Account information</h3>
+ <div class="panel">
+  <p id="profileName"></p>
+  <p id="profileEmail"></p>
+  <p>Account type: Personal</p>
+  <p>Currency: USD</p>
+ </div>
+
+ <h3 class="section">Recent transactions</h3>
+ <div class="panel" id="transactions">
+  <p class="small">No transactions yet.</p>
+ </div>
+</section>
+
+<!-- TRANSFER -->
+<div id="transferModal" class="modal">
+ <div class="dialog">
+  <button class="close" onclick="closeTransfer()">×</button>
+  <h2>Internal transfer</h2>
+  <p class="sub">Transfer to another registered Nova account.</p>
+  <label>Recipient Gmail address</label>
+  <input id="recipientEmail" type="email" placeholder="recipient@gmail.com">
+  <label>Amount (USD)</label>
+  <input id="transferAmount" type="number" min="0.01" step="0.01" placeholder="0.00">
+  <button class="primary" onclick="makeTransfer()">Continue</button>
+  <p id="transferMessage" class="error"></p>
+ </div>
+</div>
+
+<footer>
+NOVA BANK is a fictional banking interface. No real financial services or funds are provided.
+</footer>
+
+<script>
+const accounts=[];
+let currentUser=null;
+let nextNumber=4821;
+
+function showPage(id){
+ document.querySelectorAll('body > section').forEach(el=>el.classList.add('hidden'));
+ document.getElementById(id).classList.remove('hidden');
+}
+
+function money(value){
+ return '$'+value.toLocaleString('en-US',{
+  minimumFractionDigits:2,
+  maximumFractionDigits:2
+ });
+}
+
+function validGmail(email){
+ return /^[a-zA-Z0-9._%+-]+@gmail\.com$/i.test(email);
+}
+
+document.getElementById('signupForm').addEventListener('submit',function(e){
+ e.preventDefault();
+
+ const name=document.getElementById('signupName').value.trim();
+ const email=document.getElementById('signupEmail').value.trim().toLowerCase();
+ const password=document.getElementById('signupPassword').value;
+ const confirm=document.getElementById('confirmPassword').value;
+ const error=document.getElementById('signupError');
+
+ error.textContent='';
+
+ if(!name){
+  error.textContent='Enter your name.';
+  return;
+ }
+ if(!validGmail(email)){
+  error.textContent='Enter a Gmail-format address.';
+  return;
+ }
+ if(password.length<4||password.length>8){
+  error.textContent='Password must be 4–8 characters.';
+  return;
+ }
+ if(password!==confirm){
+  error.textContent='Passwords do not match.';
+  return;
+ }
+ if(accounts.some(a=>a.email===email)){
+  error.textContent='This email is already registered.';
+  return;
+ }
+
+ accounts.push({
+  name,email,password,
+  number:String(nextNumber++),
+  balance:1000,
+  transactions:[]
+ });
+
+ document.getElementById('signupForm').reset();
+ document.getElementById('loginEmail').value=email;
+ showPage('loginPage');
+ document.getElementById('loginError').textContent='Account created. Please sign in.';
+});
+
+document.getElementById('loginForm').addEventListener('submit',function(e){
+ e.preventDefault();
+
+ const email=document.getElementById('loginEmail').value.trim().toLowerCase();
+ const password=document.getElementById('loginPassword').value;
+ const account=accounts.find(a=>a.email===email&&a.password===password);
+
+ if(!account){
+  document.getElementById('loginError').textContent='Account not found. Check your details or register.';
+  return;
+ }
+
+ currentUser=account;
+ document.getElementById('loginForm').reset();
+ document.getElementById('loginError').textContent='';
+ renderDashboard();
+});
+
+function renderDashboard(){
+ if(!currentUser)return;
+
+ showPage('dashboard');
+ document.getElementById('welcomeName').textContent='Welcome, '+currentUser.name;
+ document.getElementById('balance').textContent=money(currentUser.balance);
+ document.getElementById('accountNumber').textContent='Account •••• '+currentUser.number;
+ document.getElementById('profileName').textContent='Name: '+currentUser.name;
+ document.getElementById('profileEmail').textContent='Email: '+currentUser.email;
+
+ const list=document.getElementById('transactions');
+ list.replaceChildren();
+
+ if(!currentUser.transactions.length){
+  const empty=document.createElement('p');
+  empty.className='small';
+  empty.textContent='No transactions yet.';
+  list.appendChild(empty);
+ }
+
+ currentUser.transactions.forEach(t=>{
+  const row=document.createElement('div');
+  row.className='transaction';
+  const description=document.createElement('span');
+  description.textContent=t.description;
+  const amount=document.createElement('span');
+  amount.className=t.incoming?'positive':'negative';
+  amount.textContent=(t.incoming?'+':'-')+money(t.amount);
+  row.append(description,amount);
+  list.appendChild(row);
+ });
+}
+
+function openTransfer(){
+ document.getElementById('transferMessage').textContent='';
+ document.getElementById('transferModal').style.display='flex';
+}
+function closeTransfer(){
+ document.getElementById('transferModal').style.display='none';
+}
+
+function makeTransfer(){
+ const email=document.getElementById('recipientEmail').value.trim().toLowerCase();
+ const amount=Number(document.getElementById('transferAmount').value);
+ const error=document.getElementById('transferMessage');
+ error.textContent='';
+
+ if(!validGmail(email)){
+  error.textContent='Enter a valid Gmail-format address.';
+  return;
+ }
+
+ const recipient=accounts.find(a=>a.email===email);
+
+ if(!recipient){
+  error.textContent='Recipient is not registered in this session.';
+  return;
+ }
+ if(recipient===currentUser){
+  error.textContent='You cannot transfer to yourself.';
+  return;
+ }
+ if(!Number.isFinite(amount)||amount<=0){
+  error.textContent='Enter a valid amount.';
+  return;
+ }
+ if(amount>currentUser.balance){
+  error.textContent='Insufficient balance.';
+  return;
+ }
+
+ currentUser.balance-=amount;
+ recipient.balance+=amount;
+
+ currentUser.transactions.unshift({
+  description:'Transfer to '+recipient.email,
+  amount,
+  incoming:false
+ });
+ recipient.transactions.unshift({
+  description:'Transfer from '+currentUser.email,
+  amount,
+  incoming:true
+ });
+
+ document.getElementById('recipientEmail').value='';
+ document.getElementById('transferAmount').value='';
+ closeTransfer();
+ renderDashboard();
+ alert('Simulated transfer completed. No real funds were moved.');
+}
+
+function logout(){
+ currentUser=null;
+ showPage('loginPage');
+}
+
+function message(text){
+ alert(text);
+}
+</script>
+</body>
+</html>
