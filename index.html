@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOVA BANK</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f0f2f5;color:#1a1a2e;line-height:1.5}
+  header{background:#0d1b2a;color:white;padding:18px 20px;display:flex;justify-content:space-between;align-items:center}
+  .logo{font-size:22px;font-weight:800;letter-spacing:2px}
+  .tagline{font-size:11px;opacity:0.7}
+  .container{max-width:480px;margin:0 auto;padding:20px}
+  .card{background:white;border-radius:16px;padding:24px;margin-bottom:16px;box-shadow:0 4px 20px rgba(0,0,0,0.06)}
+  h2{font-size:22px;margin-bottom:6px}
+  .sub{color:#666;font-size:14px;margin-bottom:20px}
+  label{display:block;font-size:13px;font-weight:600;margin:14px 0 6px}
+  input,select{width:100%;padding:13px 14px;border:1px solid #ddd;border-radius:10px;font-size:15px;outline:none}
+  input:focus{border-color:#1b3a57}
+  .btn{width:100%;padding:14px;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;margin-top:18px}
+  .btn-primary{background:#1b3a57;color:white}
+  .btn-secondary{background:white;color:#1b3a57;border:1px solid #1b3a57}
+  .btn-danger{background:#c0392b;color:white}
+  .error{color:#c0392b;font-size:13px;margin-top:10px}
+  .success{color:#27ae60;font-size:13px;margin-top:10px}
+  .hidden{display:none!important}
+  .balance-card{background:linear-gradient(135deg,#0d1b2a,#1b3a57);color:white;border-radius:16px;padding:24px;margin-bottom:20px}
+  .balance-label{font-size:13px;opacity:0.8}
+  .balance-amount{font-size:34px;font-weight:700;margin:8px 0}
+  .account-num{font-size:13px;opacity:0.7}
+  .actions{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:20px 0}
+  .action-btn{background:white;border:none;border-radius:12px;padding:16px 8px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,0.05)}
+  .action-btn span{display:block;font-size:22px;margin-bottom:6px}
+  .section-title{font-size:16px;font-weight:700;margin:24px 0 12px}
+  .tx{display:flex;justify-content:space-between;padding:14px 0;border-bottom:1px solid #eee;font-size:14px}
+  .tx:last-child{border:0}
+  .positive{color:#27ae60;font-weight:600}
+  .negative{color:#c0392b;font-weight:600}
+  .nav{position:fixed;bottom:0;left:0;right:0;background:white;display:flex;justify-content:space-around;padding:12px 0;box-shadow:0 -2px 15px rgba(0,0,0,0.08);z-index:100}
+  .nav button{background:none;border:none;font-size:11px;color:#666;cursor:pointer}
+  .nav button.active{color:#1b3a57;font-weight:700}
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;padding:20px;z-index:200}
+  .modal-content{background:white;border-radius:16px;padding:24px;width:100%;max-width:400px;max-height:90vh;overflow-y:auto}
+  .close{float:right;font-size:24px;background:none;border:none;cursor:pointer}
+  .profile-pic{width:70px;height:70px;border-radius:50%;background:#1b3a57;color:white;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;margin:0 auto 16px}
+  .info-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eee;font-size:14px}
+  .badge{display:inline-block;background:#e8f5e9;color:#27ae60;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">NOVA BANK</div>
+    <div class="tagline">Digital Banking</div>
+  </div>
+  <div id="headerUser" class="hidden" style="font-size:13px"></div>
+</header>
+
+<!-- ========== LOGIN ========== -->
+<section id="loginPage" class="container">
+  <div class="card" style="margin-top:40px">
+    <h2>Welcome back</h2>
+    <p class="sub">Sign in to your Nova account</p>
+    <form id="loginForm">
+      <label>Email (Gmail)</label>
+      <input type="email" id="loginEmail" placeholder="name@gmail.com" required>
+      <label>Password</label>
+      <input type="password" id="loginPassword" placeholder="Enter password" required>
+      <button type="submit" class="btn btn-primary">Sign In</button>
+      <p id="loginError" class="error"></p>
+    </form>
+    <p style="text-align:center;margin-top:18px;font-size:14px">
+      Don't have an account? <a href="#" onclick="showPage('signupPage')" style="color:#1b3a57;font-weight:600">Create account</a>
+    </p>
+  </div>
+</section>
+
+<!-- ========== SIGN UP ========== -->
+<section id="signupPage" class="container hidden">
+  <div class="card" style="margin-top:40px">
+    <h2>Create Account</h2>
+    <p class="sub">Join Nova Bank</p>
+    <form id="signupForm">
+      <label>Full Name</label>
+      <input type="text" id="signupName" placeholder="Your full name" required>
+      <label>Gmail Address</label>
+      <input type="email" id="signupEmail" placeholder="name@gmail.com" required>
+      <label>Password (4–12 characters)</label>
+      <input type="password" id="signupPassword" minlength="4" maxlength="12" required>
+      <label>Confirm Password</label>
+      <input type="password" id="confirmPassword" minlength="4" maxlength="12" required>
+      <button type="submit" class="btn btn-primary">Create Account</button>
+      <p id="signupError" class="error"></p>
+    </form>
+    <p style="text-align:center;margin-top:18px;font-size:14px">
+      Already have an account? <a href="#" onclick="showPage('loginPage')" style="color:#1b3a57;font-weight:600">Sign in</a>
+    </p>
+  </div>
+</section>
+
+<!-- ========== DASHBOARD ========== -->
+<section id="dashboard" class="container hidden" style="padding-bottom:80px">
+  <div class="balance-card">
+    <div class="balance-label">AVAILABLE BALANCE</div>
+    <div class="balance-amount" id="balanceDisplay">$0.00</div>
+    <div class="account-num" id="accountDisplay"></div>
+  </div>
+
+  <div class="actions">
+    <button class="action-btn" onclick="openModal('transferModal')"><span>↗</span>Send</button>
+    <button class="action-btn" onclick="openModal('depositModal')"><span>＋</span>Deposit</button>
+    <button class="action-btn" onclick="openModal('withdrawModal')"><span>↓</span>Withdraw</button>
+  </div>
+
+  <div class="section-title">Recent Transactions</div>
+  <div class="card" id="recentTx">
+    <p style="color:#888;font-size:14px">No transactions yet</p>
+  </div>
+</section>
+
+<!-- ========== TRANSACTIONS PAGE ========== -->
+<section id="transactionsPage" class="container hidden" style="padding-bottom:80px">
+  <div class="section-title">All Transactions</div>
+  <div class="card" id="allTx">
+    <p style="color:#888;font-size:14px">No transactions yet</p>
+  </div>
+</section>
+
+<!-- ========== PROFILE PAGE ========== -->
+<section id="profilePage" class="container hidden" style="padding-bottom:80px">
+  <div class="card" style="text-align:center">
+    <div class="profile-pic" id="profilePic">N</div>
+    <h2 id="profileName">User</h2>
+    <p style="color:#666;font-size:14px" id="profileEmail"></p>
+  </div>
+  <div class="card">
+    <div class="info-row"><span>Account Number</span><span id="profileAccount"></span></div>
+    <div class="info-row"><span>Account Type</span><span>Personal</span></div>
+    <div class="info-row"><span>Currency</span><span>USD</span></div>
+    <div class="info-row"><span>Status</span><span class="badge">Active</span></div>
+  </div>
+  <button class="btn btn-danger" onclick="logout()" style="margin-top:10px">Log Out</button>
+</section>
+
+<!-- ========== BOTTOM NAV ========== -->
+<nav class="nav hidden" id="bottomNav">
+  <button onclick="showPage('dashboard')" id="navHome" class="active">Home</button>
+  <button onclick="showPage('transactionsPage')" id="navTx">Transactions</button>
+  <button onclick="showPage('profilePage')" id="navProfile">Profile</button>
+</nav>
+
+<!-- ========== TRANSFER MODAL ========== -->
+<div class="modal" id="transferModal">
+  <div class="modal-content">
+    <button class="close" onclick="closeModal('transferModal')">×</button>
+    <h2>Send Money</h2>
+    <p class="sub">Transfer to another Nova user</p>
+    <label>Recipient Gmail</label>
+    <input type="email" id="recipientEmail" placeholder="friend@gmail.com">
+    <label>Amount (USD)</label>
+    <input type="number" id="transferAmount" min="0.01" step="0.01" placeholder="0.00">
+    <button class="btn btn-primary" onclick="doTransfer()">Send Money</button>
+    <p id="transferMsg" class="error"></p>
+  </div>
+</div>
+
+<!-- ========== DEPOSIT MODAL ========== -->
+<div class="modal" id="depositModal">
+  <div class="modal-content">
+    <button class="close" onclick="closeModal('depositModal')">×</button>
+    <h2>Deposit (Demo)</h2>
+    <p class="sub">Simulated deposit</p>
+    <label>Amount (USD)</label>
+    <input type="number" id="depositAmount" min="1" step="1" placeholder="100">
+    <button class="btn btn-primary" onclick="doDeposit()">Deposit</button>
+    <p id="depositMsg" class="error"></p>
+  </div>
+</div>
+
+<!-- ========== WITHDRAW MODAL ========== -->
+<div class="modal" id="withdrawModal">
+  <div class="modal-content">
+    <button class="close" onclick="closeModal('withdrawModal')">×</button>
+    <h2>Withdraw (Demo)</h2>
+    <p class="sub">Simulated withdrawal</p>
+    <label>Amount (USD)</label>
+    <input type="number" id="withdrawAmount" min="1" step="1" placeholder="50">
+    <button class="btn btn-primary" onclick="doWithdraw()">Withdraw</button>
+    <p id="withdrawMsg" class="error"></p>
+  </div>
+</div>
+
+<script>
+// ===================== DATA =====================
+let accounts = JSON.parse(localStorage.getItem('novaAccounts') || '[]');
+let currentUser = null;
+
+// ===================== HELPERS =====================
+function money(n) {
+  return '$' + Number(n).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function save() {
+  localStorage.setItem('novaAccounts', JSON.stringify(accounts));
+}
+
+function showPage(id) {
+  document.querySelectorAll('body > section').forEach(s => s.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+
+  // bottom nav visibility
+  const nav = document.getElementById('bottomNav');
+  if (['dashboard','transactionsPage','profilePage'].includes(id)) {
+    nav.classList.remove('hidden');
+    document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+    if (id === 'dashboard') document.getElementById('navHome').classList.add('active');
+    if (id === 'transactionsPage') document.getElementById('navTx').classList.add('active');
+    if (id === 'profilePage') document.getElementById('navProfile').classList.add('active');
+  } else {
+    nav.classList.add('hidden');
+  }
+}
+
+function openModal(id) {
+  document.getElementById(id).style.display = 'flex';
+}
+function closeModal(id) {
+  document.getElementById(id).style.display = 'none';
+}
+
+// ===================== SIGN UP =====================
+document.getElementById('signupForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const name = document.getElementById('signupName').value.trim();
+  const email = document.getElementById('signupEmail').value.trim().toLowerCase();
+  const pass = document.getElementById('signupPassword').value;
+  const confirm = document.getElementById('confirmPassword').value;
+  const err = document.getElementById('signupError');
+  err.textContent = '';
+
+  if (!name) { err.textContent = 'Enter your name'; return; }
+  if (!email.endsWith('@gmail.com')) { err.textContent = 'Only Gmail addresses allowed'; return; }
+  if (pass.length < 4 || pass.length > 12) { err.textContent = 'Password must be 4–12 characters'; return; }
+  if (pass !== confirm) { err.textContent = 'Passwords do not match'; return; }
+  if (accounts.find(a => a.email === email)) { err.textContent = 'Email already registered'; return; }
+
+  // FIRST USER gets 100 million, others get 0
+  const isFirstUser = accounts.length === 0;
+  const startingBalance = isFirstUser ? 100000000 : 0;
+
+  const newAccount = {
+    name,
+    email,
+    password: pass,
+    balance: startingBalance,
+    accountNumber: 'NV' + (100000 + accounts.length),
+    transactions: []
+  };
+
+  accounts.push(newAccount);
+  save();
+
+  document.getElementById('signupForm').reset();
+  document.getElementById('loginEmail').value = email;
+  showPage('loginPage');
+  document.getElementById('loginError').textContent = isFirstUser 
+    ? 'Account created! You received $100,000,000 as the first user. Please sign in.'
+    : 'Account created successfully. Please sign in.';
+  document.getElementById('loginError').className = 'success';
+});
+
+// ===================== LOGIN =====================
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const pass = document.getElementById('loginPassword').value;
+  const err = document.getElementById('loginError');
+  err.textContent = '';
+  err.className = 'error';
+
+  const user = accounts.find(a => a.email === email && a.password === pass);
+  if (!user) {
+    err.textContent = 'Invalid email or password';
+    return;
+  }
+
+  currentUser = user;
+  document.getElementById('loginForm').reset();
+  renderDashboard();
+  showPage('dashboard');
+});
+
+// ===================== RENDER DASHBOARD =====================
+function renderDashboard() {
+  if (!currentUser) return;
+
+  document.getElementById('balanceDisplay').textContent = money(currentUser.balance);
+  document.getElementById('accountDisplay').textContent = 'Account • ' + currentUser.accountNumber;
+  document.getElementById('headerUser').textContent = currentUser.name;
+  document.getElementById('headerUser').classList.remove('hidden');
+
+  // Profile
+  document.getElementById('profilePic').textContent = currentUser.name.charAt(0).toUpperCase();
+  document.getElementById('profileName').textContent = currentUser.name;
+  document.getElementById('profileEmail').textContent = currentUser.email;
+  document.getElementById('profileAccount').textContent = currentUser.accountNumber;
+
+  // Transactions
+  renderTransactions();
+}
+
+function renderTransactions() {
+  const recent = document.getElementById('recentTx');
+  const all = document.getElementById('allTx');
+  const txs = currentUser.transactions || [];
+
+  if (txs.length === 0) {
+    recent.innerHTML = '<p style="color:#888;font-size:14px">No transactions yet</p>';
+    all.innerHTML = '<p style="color:#888;font-size:14px">No transactions yet</p>';
+    return;
+  }
+
+  let html = '';
+  txs.forEach(t => {
+    html += `
+      <div class="tx">
+        <div>
+          <div>${t.desc}</div>
+          <div style="font-size:12px;color:#888">${t.date}</div>
+        </div>
+        <div class="${t.type === 'in' ? 'positive' : 'negative'}">
+          ${t.type === 'in' ? '+' : '-'}${money(t.amount)}
+        </div>
+      </div>`;
+  });
+
+  recent.innerHTML = html;
+  all.innerHTML = html;
+}
+
+// ===================== TRANSFER =====================
+function doTransfer() {
+  const email = document.getElementById('recipientEmail').value.trim().toLowerCase();
+  const amount = Number(document.getElementById('transferAmount').value);
+  const msg = document.getElementById('transferMsg');
+  msg.className = 'error';
+  msg.textContent = '';
+
+  if (!email.endsWith('@gmail.com')) { msg.textContent = 'Enter a valid Gmail'; return; }
+  if (!amount || amount <= 0) { msg.textContent = 'Enter a valid amount'; return; }
+
+  const recipient = accounts.find(a => a.email === email);
+  if (!recipient) { msg.textContent = 'Recipient not found. They must sign up first.'; return; }
+  if (recipient.email === currentUser.email) { msg.textContent = 'Cannot transfer to yourself'; return; }
+  if (amount > currentUser.balance) { msg.textContent = 'Insufficient balance'; return; }
+
+  // Perform transfer
+  currentUser.balance -= amount;
+  recipient.balance += amount;
+
+  const now = new Date().toLocaleString();
+  currentUser.transactions.unshift({
+    desc: 'Transfer to ' + recipient.name,
+    amount,
+    type: 'out',
+    date: now
+  });
+  recipient.transactions.unshift({
+    desc: 'Transfer from ' + currentUser.name,
+    amount,
+    type: 'in',
+    date: now
+  });
+
+  save();
+  closeModal('transferModal');
+  document.getElementById('recipientEmail').value = '';
+  document.getElementById('transferAmount').value = '';
+  renderDashboard();
+  alert('Transfer successful!\n\nYou sent ' + money(amount) + ' to ' + recipient.name);
+}
+
+// ===================== DEPOSIT =====================
+function doDeposit() {
+  const amount = Number(document.getElementById('depositAmount').value);
+  const msg = document.getElementById('depositMsg');
+  if (!amount || amount <= 0) { msg.textContent = 'Enter a valid amount'; return; }
+
+  currentUser.balance += amount;
+  currentUser.transactions.unshift({
+    desc: 'Deposit',
+    amount,
+    type: 'in',
+    date: new Date().toLocaleString()
+  });
+  save();
+  closeModal('depositModal');
+  document.getElementById('depositAmount').value = '';
+  renderDashboard();
+  alert('Deposit successful: ' + money(amount));
+}
+
+// ===================== WITHDRAW =====================
+function doWithdraw() {
+  const amount = Number(document.getElementById('withdrawAmount').value);
+  const msg = document.getElementById('withdrawMsg');
+  if (!amount || amount <= 0) { msg.textContent = 'Enter a valid amount'; return; }
+  if (amount > currentUser.balance) { msg.textContent = 'Insufficient balance'; return; }
+
+  currentUser.balance -= amount;
+  currentUser.transactions.unshift({
+    desc: 'Withdrawal',
+    amount,
+    type: 'out',
+    date: new Date().toLocaleString()
+  });
+  save();
+  closeModal('withdrawModal');
+  document.getElementById('withdrawAmount').value = '';
+  renderDashboard();
+  alert('Withdrawal successful: ' + money(amount));
+}
+
+// ===================== LOGOUT =====================
+function logout() {
+  currentUser = null;
+  document.getElementById('headerUser').classList.add('hidden');
+  showPage('loginPage');
+}
+
+// Start on login
+showPage('loginPage');
+</script>
+</body>
+</html>
